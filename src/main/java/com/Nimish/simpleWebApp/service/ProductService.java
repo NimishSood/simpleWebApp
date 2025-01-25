@@ -1,8 +1,10 @@
 package com.Nimish.simpleWebApp.service;
 
 import com.Nimish.simpleWebApp.model.Product;
+import com.Nimish.simpleWebApp.repository.ProductRepo;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,29 +15,32 @@ import java.util.List;
 @Setter
 public class ProductService
 {
-    List<Product> products= new ArrayList<>(Arrays.asList(
-            new Product(101,"iPhone",50000),
-            new Product(102,"Canon Camera",70000),
-            new Product(103,"Shure Mic",10000)));
+    @Autowired
+    ProductRepo repo;
+
+    //These are all the built-in methods of the JPA interface
+    public List<Product>getProducts()
+    {
+        return repo.findAll();
+    }
 
     public Product getProductById(int prodId)
     {
-//        for (Product product : products)
-//        {
-//            if (product.getProdId() == id)
-//            {
-//                return product;
-//            }
-//        }
-        return products.stream()
-                .filter(product-> product.getProdId()==prodId)
-                .findFirst().orElseGet(()->new Product(100,"No Product",100)); // using stream API if we do not find a project with a matching id we create
-                // a new product with the given parameters
-    }
-    public void addProduct(Product product)
-    {
-        System.out.println(product);
-        products.add(product);
+        return repo.findById(prodId).orElse(null);
     }
 
+    public void addProduct(Product product)
+    {
+        repo.save(product);
+    }
+    // No unique method to update, if the object does not exist it creates one
+    public void updateProduct(Product product)
+    {
+        repo.save(product);
+    }
+
+    public void deleteProduct(int prodId)
+    {
+        repo.deleteById(prodId);
+    }
 }
